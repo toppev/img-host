@@ -2,42 +2,50 @@ package dev.toppe
 
 import com.google.gson.Gson
 import io.ktor.application.call
-import io.ktor.http.ContentType
-import io.ktor.locations.get
+import io.ktor.locations.post
 import io.ktor.request.receiveStream
 import io.ktor.response.respondText
 import io.ktor.routing.Route
-import io.ktor.routing.post
+import org.bson.types.ObjectId
 import java.io.BufferedReader
 import java.io.File
+import java.io.InputStream
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.*
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
-
 fun Route.upload(imageDatabase: ImageDatabase, uploadDir: File) {
 
-    post("/upload") {
+    post<Upload> {
         // TODO: implement UploadLimit
-        val reader = BufferedReader(call.receiveStream().reader())
-        val obj = Gson().fromJson(reader, Map::class.java)
-        val imageBase64 = obj["image"] as String
-        val fileName = Random().nextInt(1000).toString()
-        val targetFile = File(uploadDir, fileName)
-        val image = Image(targetFile.name, getInMillis(obj["expiration"] as String))
-        imageDatabase.saveImage(image)
-        val file = Files.createFile(targetFile.toPath())
-        val urlDecoded = URLDecoder.decode(imageBase64, StandardCharsets.UTF_8.name())
-        val imageByteArray = Base64.getDecoder().decode(urlDecoded)
-        targetFile.writeBytes(imageByteArray)
-        call.respondText(Gson().toJson(mapOf("id" to fileName)))
+        val map = parseUpload(call.receiveStream())
+        if (map != null) {
+            val id = ObjectId()
+            // TODO different extensions
+            val fileName = "$id.png"
+            val targetFile = File(uploadDir, fileName)
+            val image = Image(targetFile.name, getInMillis(map["expiration"] as String))
+            imageDatabase.saveImage(image, id)
+            saveToFile(targetFile, decodeImage(map["image"] as String))
+            call.respondText(Gson().toJson(mapOf("id" to id.toString())))
+        }
     }
+}
 
-    get<Upload> {
-        call.respondText("HELLO POSTER!", contentType = ContentType.Text.Plain)
-    }
+private fun parseUpload(stream: InputStream): Map<*, *>? {
+    val reader = BufferedReader(stream.reader())
+    return Gson().fromJson(reader, Map::class.java)
+}
+
+private fun decodeImage(encoded: String): ByteArray {
+    val urlDecoded = URLDecoder.decode(encoded, StandardCharsets.UTF_8.name())
+    return Base64.getDecoder().decode(urlDecoded)
+}
+
+private fun saveToFile(targetFile: File, byteArray: ByteArray) {
+    val file = Files.createFile(targetFile.toPath())
+    targetFile.writeBytes(byteArray)
 }
 
 data class UploadLimit(val address: String, val maxUploads: Int, val duration: Long) {

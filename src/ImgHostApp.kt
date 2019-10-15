@@ -24,6 +24,9 @@ data class ViewImage(val id: Long)
 @Location("/upload")
 class Upload
 
+@Location("/")
+class Index
+
 private val user = "root"
 private val database = "uploads"
 private val password = "root"
@@ -67,6 +70,7 @@ fun Application.main(testing: Boolean = false) {
         upload(imageDatabase, uploadDir)
         viewImage(imageDatabase)
         styles()
+        index()
     }
 }
 
