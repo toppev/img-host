@@ -6,3 +6,5 @@
 *.ipr
 *.iws
 uploads
+# Used for testing
+index.html

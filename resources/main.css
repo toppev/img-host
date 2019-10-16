@@ -1,5 +1,6 @@
 body {
   background-color: #313131;
+  font-family: 'Open Sans', sans-serif;
 }
 .main {
   background-color: #516794;
@@ -13,4 +14,8 @@ body {
 }
 .github {
   color: lightgrey;
+}
+.desc {
+  margin-top: 55px;
+  margin-bottom: 45px;
 }
