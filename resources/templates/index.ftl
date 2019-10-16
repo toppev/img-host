@@ -90,6 +90,7 @@
                         © 2019 Copyright Text
                     </div>
                 </div>
+            </div>
         </footer>
     </div>
 </body>
