@@ -10,14 +10,15 @@ import io.ktor.application.install
 import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.http.ContentType
-import io.ktor.http.content.default
-import io.ktor.http.content.files
-import io.ktor.http.content.static
+import io.ktor.http.content.*
 import io.ktor.locations.Location
 import io.ktor.locations.Locations
 import io.ktor.routing.routing
 import java.io.File
 import java.io.IOException
+import java.nio.file.Paths
+
+
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -75,8 +76,9 @@ fun Application.main(testing: Boolean = false) {
         viewImage(imageDatabase)
         styles()
         index()
-        static("/") {
-            files("static")
+
+        static("static") {
+            resources("static")
         }
     }
 }
