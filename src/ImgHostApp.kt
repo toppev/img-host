@@ -22,7 +22,7 @@ import java.io.IOException
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 @Location("/img/{id}")
-data class ViewImage(val id: Long)
+data class ViewImage(val id: String)
 
 @Location("/upload")
 class Upload
@@ -54,13 +54,14 @@ fun Application.main(testing: Boolean = false) {
     // Log every call (request/response)
     install(CallLogging)
     install(Locations)
-    // Automatic '304 Not Modified' Responses
+    // Automatic '304 Not Modified' responses
     install(ConditionalHeaders)
     install(Compression) {
         default()
         excludeContentType(ContentType.Video.Any)
     }
 
+    // Load templates
     install(FreeMarker) {
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, "templates")
     }
