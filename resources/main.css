@@ -1,9 +1,6 @@
 body {
-  background-color: #313131;
-  font-family: 'Open Sans', sans-serif;
-}
-.main {
   background-color: #516794;
+  font-family: 'Open Sans', sans-serif;
 }
 .release {
   margin: 60px 20px 45px;
