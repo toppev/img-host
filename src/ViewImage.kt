@@ -21,8 +21,11 @@ fun Route.viewImage(imageDatabase: ImageDatabase) {
 
     get<ViewImage> {
         // Remove file extension if present
-        var id = if(it.id.contains(".")) it.id.substring(0, it.id.lastIndexOf('.')) else it.id
-        if (id != null) {
+        if(it.id == null || !validIdString(it.id)) {
+            call.respond(HttpStatusCode.BadRequest)
+        }
+        else {
+            var id = if(it.id.contains(".")) it.id.substring(0, it.id.lastIndexOf('.')) else it.id
             val img = imageDatabase.findImageById(id)
             if (img == null || !img.exists()) {
                 call.respond(HttpStatusCode.NotFound)
@@ -45,11 +48,18 @@ fun Route.viewImage(imageDatabase: ImageDatabase) {
         var path = uploadDir + File.separator + it.id
         val file = File(path)
         // Just to be sure
-        if (!file.exists() || !it.id.matches("[A-Za-z0-9.]+".toRegex())){
+        if(!validIdString(it.id)) {
+            call.respond(HttpStatusCode.BadRequest)
+        }
+        else if (!file.exists()){
             call.respond(HttpStatusCode.NotFound)
         }
         else {
             call.respond(LocalFileContent(file, contentType = ContentType.fromFilePath(path).first { it -> it.contentType == "image" }))
         }
     }
+}
+
+private fun validIdString(id: String): Boolean {
+    return id.matches("[A-Za-z0-9.]+".toRegex())
 }
