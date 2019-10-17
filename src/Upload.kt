@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.*
 
-fun Route.upload(imageDatabase: ImageDatabase, uploadDir: File) {
+fun Route.upload(imageDatabase: ImageDatabase) {
 
     post<Upload> {
         // TODO: implement UploadLimit
@@ -25,7 +25,7 @@ fun Route.upload(imageDatabase: ImageDatabase, uploadDir: File) {
             // TODO different extensions
             val fileName = "$id.png"
             val targetFile = File(uploadDir, fileName)
-            val image = Image(targetFile.name, getInMillis(map["expiration"] as String))
+            val image = Image(targetFile.path, getInMillis(map["expiration"] as String))
             imageDatabase.saveImage(image, id)
             saveToFile(targetFile, decodeImage(map["image"] as String))
             call.respondText(Gson().toJson(mapOf("id" to id.toString())))

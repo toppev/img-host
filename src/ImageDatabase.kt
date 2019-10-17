@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import com.mongodb.BasicDBObject
 import com.mongodb.client.MongoClient
 import org.bson.Document
+import org.bson.json.JsonMode
+import org.bson.json.JsonWriterSettings
 import org.bson.types.ObjectId
 import java.io.File
 
@@ -22,10 +24,22 @@ class ImageDatabase(mongoClient: MongoClient, database: String, uploadDir: File)
         return doc.getObjectId("_id")
     }
 
-    fun findImageById(id: Long): Image? {
-        val query = BasicDBObject()
-        query["_id"] = id
+    fun findImageById(id: String): Image? {
+        val query = BasicDBObject("_id", ObjectId(id))
         val obj = database.getCollection(collection).find(query).first()
-        return Gson().fromJson(obj?.toString(), Image::class.java)
+        var writerSettings = JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()
+        return Gson().fromJson(obj?.toJson(writerSettings), Image::class.java)
+    }
+
+    /**
+     * Updates the database, adds one to "views" and updates "lastSeen".
+     * NOTE: Does not change the given image object, only updates the database
+     */
+    fun updateOnView(image: Image, id: String){
+        val updateFields = BasicDBObject()
+        updateFields.append("views", image.views+1)
+        updateFields.append("lastViewed", System.currentTimeMillis())
+        val searchQuery = BasicDBObject("_id", ObjectId(id))
+        database.getCollection(collection).updateOne(searchQuery, BasicDBObject("\$set", updateFields))
     }
 }

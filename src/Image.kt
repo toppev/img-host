@@ -10,6 +10,7 @@ data class Image(
 ) {
 
     var views: Int = 0
+    var lastViewed: Long? = null
 
     fun getFile(): File {
         return File(path)

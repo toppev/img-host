@@ -16,16 +16,17 @@ import io.ktor.locations.Locations
 import io.ktor.routing.routing
 import java.io.File
 import java.io.IOException
-import java.nio.file.Paths
-
 
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-@Location("/img/{id}")
+@Location("/{id}")
 data class ViewImage(val id: String)
 
-@Location("/upload")
+@Location("/img/{id}")
+class RawImage(val id: String)
+
+@Location("/api/upload")
 class Upload
 
 @Location("/")
@@ -39,7 +40,7 @@ private val connectionString = ConnectionString("mongodb://localhost:27017")
 private val settings = MongoClientSettings.builder()
     .applyConnectionString(connectionString).build()
 
-private val uploadDir = "uploads"
+val uploadDir = "./uploads"
 
 private val imageDatabase = ImageDatabase(
     MongoClients.create(settings),
@@ -67,12 +68,12 @@ fun Application.main(testing: Boolean = false) {
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, "templates")
     }
 
-    val uploadDir = File(uploadDir)
-    if (!uploadDir.mkdirs() && !uploadDir.exists()) {
-        throw IOException("Failed to create directory ${uploadDir.absolutePath}")
+    val uploadFile = File(uploadDir)
+    if (!uploadFile.mkdirs() && !uploadFile.exists()) {
+        throw IOException("Failed to create directory ${uploadFile.absolutePath}")
     }
     routing {
-        upload(imageDatabase, uploadDir)
+        upload(imageDatabase)
         viewImage(imageDatabase)
         styles()
         index()
