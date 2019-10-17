@@ -53,7 +53,7 @@
                                 </tr>
                                 <tr>
                                     <td>CTRL + U</td>
-                                    <td>Upload the image to Imgur</td>
+                                    <td>Upload the image</td>
                                 </tr>
                                 <tr>
                                     <td>CTRL + S</td>
