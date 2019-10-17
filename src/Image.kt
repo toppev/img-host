@@ -1,4 +1,4 @@
-package dev.toppe
+package dev.toppe.img.host
 
 import java.io.File
 

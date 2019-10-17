@@ -17,7 +17,7 @@
         <div class="container">
             <div class="card">
                 <div class="card-image">
-                    <img src="./raw/${id}.png">
+                    <img src="./img/${id}.png">
                 </div>
             </div>
             <div class="card-content teal lighten-1 z-depth-2">

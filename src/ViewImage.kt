@@ -1,4 +1,4 @@
-package dev.toppe
+package dev.toppe.img.host
 
 import io.ktor.application.call
 import io.ktor.freemarker.FreeMarkerContent

@@ -1,4 +1,4 @@
-package dev.toppe
+package dev.toppe.img.host
 
 enum class TimeFormat(val letter: Char, toMillis: (number: Long) -> Long) {
 

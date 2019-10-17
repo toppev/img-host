@@ -1,4 +1,4 @@
-package dev.toppe
+package dev.toppe.img.host
 
 import com.google.gson.Gson
 import io.ktor.application.call

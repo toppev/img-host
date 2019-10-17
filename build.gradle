@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'kotlin'
 apply plugin: 'application'
 
-group 'dev.toppe'
+group 'dev.toppe.img.host'
 version '0.0.1'
 mainClassName = "io.ktor.server.netty.EngineMain"
 
