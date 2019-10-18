@@ -12,7 +12,6 @@ import java.io.File
 import java.io.InputStream
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 import java.util.*
 
 fun Route.upload(imageDatabase: ImageDatabase) {
@@ -44,7 +43,6 @@ private fun decodeImage(encoded: String): ByteArray {
 }
 
 private fun saveToFile(targetFile: File, byteArray: ByteArray) {
-    val file = Files.createFile(targetFile.toPath())
     targetFile.writeBytes(byteArray)
 }
 
@@ -61,11 +59,9 @@ data class UploadLimit(val address: String, val maxUploads: Int, val duration: L
 
     fun tryConsume(i: Int): Boolean {
         require(i > 0) { "tryConsume with parameter 0 is not allowed" }
-        if (uploadsLeft < i) {
-            if (nextReset < System.currentTimeMillis()) {
-                nextReset = System.currentTimeMillis() + duration
-                uploadsLeft = maxUploads
-            }
+        if (uploadsLeft < i && nextReset < System.currentTimeMillis()) {
+            nextReset = System.currentTimeMillis() + duration
+            uploadsLeft = maxUploads
         }
         uploadsLeft -= i
         return uploadsLeft > 0

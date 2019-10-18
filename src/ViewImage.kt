@@ -9,10 +9,6 @@ import io.ktor.http.fromFilePath
 import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.routing.Route
-import kotlinx.css.i
-import kotlinx.css.img
-import kotlinx.css.video
-import kotlinx.html.InputType
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,22 +17,29 @@ fun Route.viewImage(imageDatabase: ImageDatabase) {
 
     get<ViewImage> {
         // Remove file extension if present
-        if(it.id == null || !validIdString(it.id)) {
+        if (!validIdString(it.id)) {
             call.respond(HttpStatusCode.BadRequest)
-        }
-        else {
-            var id = if(it.id.contains(".")) it.id.substring(0, it.id.lastIndexOf('.')) else it.id
+        } else {
+            val id = if (it.id.contains(".")) it.id.substring(0, it.id.lastIndexOf('.')) else it.id
             val img = imageDatabase.findImageById(id)
             if (img == null || !img.exists()) {
                 call.respond(HttpStatusCode.NotFound)
             } else {
                 val created = SimpleDateFormat().format(Date(img.created))
-                val expires = if (img.expires()) SimpleDateFormat().format(Date(System.currentTimeMillis() + img.expiration!!)) else "never"
-                val lastViewed = if (img.lastViewed != null) SimpleDateFormat().format(Date(img.lastViewed!!)) else "never"
+                val expires =
+                    if (img.expires()) SimpleDateFormat().format(Date(System.currentTimeMillis() + img.expiration!!)) else "never"
+                val lastViewed =
+                    if (img.lastViewed != null) SimpleDateFormat().format(Date(img.lastViewed!!)) else "never"
                 call.respond(
                     FreeMarkerContent(
                         "image.ftl",
-                        mapOf("image" to img, "id" to id, "created" to created, "expires" to expires, "lastViewed" to lastViewed)
+                        mapOf(
+                            "image" to img,
+                            "id" to id,
+                            "created" to created,
+                            "expires" to expires,
+                            "lastViewed" to lastViewed
+                        )
                     )
                 )
                 imageDatabase.updateOnView(img, id)
@@ -44,18 +47,20 @@ fun Route.viewImage(imageDatabase: ImageDatabase) {
         }
     }
 
-    get<RawImage> {
-        var path = uploadDir + File.separator + it.id
+    get<RawImage> { it ->
+        val path = uploadDir + File.separator + it.id
         val file = File(path)
         // Just to be sure
-        if(!validIdString(it.id)) {
+        if (!validIdString(it.id)) {
             call.respond(HttpStatusCode.BadRequest)
-        }
-        else if (!file.exists()){
+        } else if (!file.exists()) {
             call.respond(HttpStatusCode.NotFound)
-        }
-        else {
-            call.respond(LocalFileContent(file, contentType = ContentType.fromFilePath(path).first { it -> it.contentType == "image" }))
+        } else {
+            call.respond(
+                LocalFileContent(
+                    file,
+                    contentType = ContentType.fromFilePath(path).first { it.contentType == "image" })
+            )
         }
     }
 }
