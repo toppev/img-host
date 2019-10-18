@@ -1,6 +1,6 @@
 package dev.toppe.img.host
 
-enum class TimeFormat(val letter: Char, toMillis: (number: Long) -> Long) {
+enum class TimeFormat(val letter: Char, val toMillis: (number: Long) -> Long) {
 
     YEAR('Y', { java.util.concurrent.TimeUnit.DAYS.toMillis(365 * it) }),
     MONTH('M', { java.util.concurrent.TimeUnit.DAYS.toMillis(30 * it) }),
@@ -14,7 +14,7 @@ fun getInMillis(format: String): Long? {
     for (value in TimeFormat.values()) {
         if (value.letter == letter || value.letter.toLowerCase() == letter) {
             val numbers = format.substring(format.length - 1)
-            return numbers.toLongOrNull()
+            return numbers.toLongOrNull()?.let { value.toMillis(it) }
         }
     }
     return null
