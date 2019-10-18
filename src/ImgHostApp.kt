@@ -67,7 +67,7 @@ fun Application.main(testing: Boolean = false) {
     routing {
         upload(imageDatabase)
         viewImage(imageDatabase)
-        styles()
+                // styles()
         index()
 
         static("static") {
@@ -78,7 +78,7 @@ fun Application.main(testing: Boolean = false) {
 
 fun loadDatabase(): ImageDatabase {
     val prop = Properties()
-    val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("/database.properties")
+    val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("database.properties")
     prop.load(stream)
     val database = prop.getProperty("database")
     val credential = MongoCredential.createCredential(
