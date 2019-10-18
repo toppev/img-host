@@ -10,12 +10,15 @@ import io.ktor.application.install
 import io.ktor.features.*
 import io.ktor.freemarker.FreeMarker
 import io.ktor.http.ContentType
-import io.ktor.http.content.*
+import io.ktor.http.content.resources
+import io.ktor.http.content.static
 import io.ktor.locations.Location
 import io.ktor.locations.Locations
 import io.ktor.routing.routing
+import kotlinx.css.Position
 import java.io.File
 import java.io.IOException
+import java.util.*
 
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -32,21 +35,8 @@ class Upload
 @Location("/")
 class Index
 
-private val user = "root"
-private val database = "uploads"
-private val password = "root"
-private val credential = MongoCredential.createCredential(user, database, password.toCharArray())
-private val connectionString = ConnectionString("mongodb://localhost:27017")
-private val settings = MongoClientSettings.builder()
-    .applyConnectionString(connectionString).build()
+const val uploadDir = "./uploads"
 
-val uploadDir = "./uploads"
-
-private val imageDatabase = ImageDatabase(
-    MongoClients.create(settings),
-    database,
-    File(uploadDir)
-)
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
@@ -72,6 +62,8 @@ fun Application.main(testing: Boolean = false) {
     if (!uploadFile.mkdirs() && !uploadFile.exists()) {
         throw IOException("Failed to create directory ${uploadFile.absolutePath}")
     }
+    val imageDatabase = loadDatabase()
+
     routing {
         upload(imageDatabase)
         viewImage(imageDatabase)
@@ -82,5 +74,24 @@ fun Application.main(testing: Boolean = false) {
             resources("static")
         }
     }
+}
+
+fun loadDatabase(): ImageDatabase {
+    val prop = Properties()
+    val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("/database.properties")
+    prop.load(stream)
+    val database = prop.getProperty("database")
+    val credential = MongoCredential.createCredential(
+        prop.getProperty("user"),
+        database,
+        prop.getProperty("password").toCharArray()
+    )
+    val settings = MongoClientSettings.builder()
+        .applyConnectionString(ConnectionString("mongodb://localhost:27017")).credential(credential).build()
+    return ImageDatabase(
+        MongoClients.create(settings),
+        database,
+        File(uploadDir)
+    )
 }
 
