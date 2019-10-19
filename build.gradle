@@ -21,7 +21,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 shadowJar {
     manifest {
-        attributes 'Main-Class': 'io.ktor.server.netty.EngineMain'
+        attributes 'Main-Class': mainClassName
         baseName = 'img-host'
         version = null
     }
