@@ -87,7 +87,7 @@ fun loadDatabase(): ImageDatabase {
         prop.getProperty("password").toCharArray()
     )
     val settings = MongoClientSettings.builder()
-        .applyConnectionString(ConnectionString("mongodb://localhost:27017")).credential(credential).build()
+        .applyConnectionString(ConnectionString("mongodb://${prop.getProperty("url")}:27017")).credential(credential).build()
     return ImageDatabase(
         MongoClients.create(settings),
         database,
