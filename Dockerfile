@@ -1,4 +1,4 @@
 FROM openjdk:8
-ADD build/libs/img-host-all.jar img-host-all.jar
+ADD build/libs/img-host.jar img-host.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "img-host-all.jar"]
+ENTRYPOINT ["java", "-jar", "img-host.jar"]
