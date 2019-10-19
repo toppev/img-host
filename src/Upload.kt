@@ -1,24 +1,48 @@
 package dev.toppe.img.host
 
 import com.google.gson.Gson
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
 import io.ktor.locations.post
+import io.ktor.network.selector.SelectInterest.Companion.size
+import io.ktor.request.receive
 import io.ktor.request.receiveStream
+import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
+import kotlinx.css.map
+import kotlinx.html.InputType
 import org.bson.types.ObjectId
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStream
+import java.io.*
+import java.lang.StringBuilder
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.util.*
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.io.PipedOutputStream
+
+
+
+
+/**
+ * Represents how much disk space we use (approximately)
+ */
+private var spaceUsed = Files.walk(Paths.get(uploadDir)).mapToLong { it.toFile().length() }.sum()
+private var maxPostLenght = 2000000
 
 fun Route.upload(imageDatabase: ImageDatabase) {
 
     post<Upload> {
         // TODO: implement UploadLimit
-        val map = parseUpload(call.receiveStream())
+        println("got here")
+
+        val map = Gson().fromJson(InputStreamReader(call.receiveStream()), Map::class.java)
         if (map != null) {
             val id = ObjectId()
             // TODO different extensions
@@ -32,9 +56,11 @@ fun Route.upload(imageDatabase: ImageDatabase) {
     }
 }
 
-private fun parseUpload(stream: InputStream): Map<*, *>? {
-    val reader = BufferedReader(stream.reader())
-    return Gson().fromJson(reader, Map::class.java)
+private fun checkDiskSpace(bytes: Long): Boolean {
+    spaceUsed += bytes
+    // In megabytes
+    val max = System.getProperty("maxDiskUsage").toLongOrNull()
+    return if (max == null) true else spaceUsed < max
 }
 
 private fun decodeImage(encoded: String): ByteArray {
@@ -44,6 +70,12 @@ private fun decodeImage(encoded: String): ByteArray {
 
 private fun saveToFile(targetFile: File, byteArray: ByteArray) {
     targetFile.writeBytes(byteArray)
+}
+
+fun main(args: Array<String>) {
+    val file = File("C:\\Users\\Topias\\projects\\hyclans\\hyclans-web")
+    println(file.totalSpace)
+   println(Files.walk(file.toPath()).mapToLong { p -> p.toFile().length() }.sum())
 }
 
 data class UploadLimit(val address: String, val maxUploads: Int, val duration: Long) {
