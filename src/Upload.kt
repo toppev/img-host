@@ -1,66 +1,55 @@
 package dev.toppe.img.host
 
 import com.google.gson.Gson
-import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.post
-import io.ktor.network.selector.SelectInterest.Companion.size
-import io.ktor.request.receive
 import io.ktor.request.receiveStream
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
-import kotlinx.css.map
-import kotlinx.html.InputType
 import org.bson.types.ObjectId
 import java.io.*
-import java.lang.StringBuilder
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
-import java.util.*
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.io.PipedOutputStream
-
-
+import java.util.*
 
 
 /**
  * Represents how much disk space we use (approximately)
  */
 private var spaceUsed = Files.walk(Paths.get(uploadDir)).mapToLong { it.toFile().length() }.sum()
-private var maxPostLenght = 2000000
+private var maxPostSize = 2000000
 
 fun Route.upload(imageDatabase: ImageDatabase) {
 
     post<Upload> {
         // TODO: implement UploadLimit
-        println("got here")
-
-        val map = Gson().fromJson(InputStreamReader(call.receiveStream()), Map::class.java)
-        if (map != null) {
-            val id = ObjectId()
-            // TODO different extensions
-            val fileName = "$id.png"
-            val targetFile = File(uploadDir, fileName)
-            val image = Image(targetFile.path, getInMillis(map["expiration"] as String))
-            imageDatabase.saveImage(image, id)
-            saveToFile(targetFile, decodeImage(map["image"] as String))
-            call.respondText(Gson().toJson(mapOf("id" to id.toString())))
+        val input = call.receiveStream()
+        val map = Gson().fromJson(InputStreamReader(input.buffered()), Map::class.java)
+        val id = ObjectId()
+        // TODO different extensions
+        val fileName = "$id.png"
+        val targetFile = File(uploadDir, fileName)
+        val image = Image(targetFile.path, getInMillis(map["expiration"] as String))
+        imageDatabase.saveImage(image, id)
+        val byteArray = decodeImage(map["image"] as String)
+        if(!checkDiskSpace(byteArray.size.toLong())) {
+            call.respond(HttpStatusCode.InsufficientStorage)
         }
+        saveToFile(targetFile, byteArray)
+        call.respondText(Gson().toJson(mapOf("id" to id.toString())))
     }
 }
 
 private fun checkDiskSpace(bytes: Long): Boolean {
+    if (bytes == 0L) return true
     spaceUsed += bytes
     // In megabytes
-    val max = System.getProperty("maxDiskUsage").toLongOrNull()
-    return if (max == null) true else spaceUsed < max
+    val max = System.getProperty("maxDiskUsage")?.toLongOrNull()
+    return if (max == null) true else spaceUsed < max * 1024 * 1024
 }
 
 private fun decodeImage(encoded: String): ByteArray {
@@ -70,12 +59,6 @@ private fun decodeImage(encoded: String): ByteArray {
 
 private fun saveToFile(targetFile: File, byteArray: ByteArray) {
     targetFile.writeBytes(byteArray)
-}
-
-fun main(args: Array<String>) {
-    val file = File("C:\\Users\\Topias\\projects\\hyclans\\hyclans-web")
-    println(file.totalSpace)
-   println(Files.walk(file.toPath()).mapToLong { p -> p.toFile().length() }.sum())
 }
 
 data class UploadLimit(val address: String, val maxUploads: Int, val duration: Long) {
