@@ -36,6 +36,9 @@ fun Route.upload(imageDatabase: ImageDatabase) {
         val image = Image(targetFile.path, getInMillis(map["expiration"] as String))
         imageDatabase.saveImage(image, id)
         val byteArray = decodeImage(map["image"] as String)
+        if(byteArray.size > maxPostSize) {
+            call.respond(HttpStatusCode.BadRequest, "Post size limit exceeded")
+        }
         if(!checkDiskSpace(byteArray.size.toLong())) {
             call.respond(HttpStatusCode.InsufficientStorage)
         }
