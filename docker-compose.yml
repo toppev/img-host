@@ -10,10 +10,10 @@ services:
       - mongo
     volumes:
       - ./img_host_uploads:/uploads
-    environment:
+    #environment:
       # provide your credentials here
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=mypass123
+      #- MONGO_INITDB_ROOT_USERNAME=root
+      #- MONGO_INITDB_ROOT_PASSWORD=mypass123
   mongo:
     container_name: mongo
     image: mongo

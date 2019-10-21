@@ -81,15 +81,16 @@ fun loadDatabase(): ImageDatabase {
     val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("database.properties")
     prop.load(stream)
     val database = prop.getProperty("database")
-    val credential = MongoCredential.createCredential(
-        prop.getProperty("user"),
-        database,
-        prop.getProperty("password").toCharArray()
-    )
+    val user = prop.getProperty("user", null)
+    val pass = prop.getProperty("password", null)
     val settings = MongoClientSettings.builder()
-        .applyConnectionString(ConnectionString("mongodb://${prop.getProperty("url")}:27017")).credential(credential).build()
+        .applyConnectionString(ConnectionString("mongodb://${prop.getProperty("url")}:27017"))
+    // Credentials are optional
+    if (user != null && pass != null) {
+        settings.credential(MongoCredential.createCredential(user, database, pass.toCharArray()))
+    }
     return ImageDatabase(
-        MongoClients.create(settings),
+        MongoClients.create(settings.build()),
         database,
         File(uploadDir)
     )
