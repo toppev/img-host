@@ -8,6 +8,8 @@ import io.ktor.request.receiveStream
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.Route
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
 import java.io.*
 import java.net.URLDecoder
@@ -35,15 +37,16 @@ fun Route.upload(imageDatabase: ImageDatabase) {
         val targetFile = File(uploadDir, fileName)
         val image = Image(targetFile.path, getInMillis(map["expiration"] as String))
         imageDatabase.saveImage(image, id)
-        val byteArray = decodeImage(map["image"] as String)
-        if(byteArray.size > maxPostSize) {
+        val imgStr = map["image"] as String
+        val len = imgStr.length.toLong()
+        if(len > maxPostSize) {
             call.respond(HttpStatusCode.BadRequest, "Post size limit exceeded")
         }
-        if(!checkDiskSpace(byteArray.size.toLong())) {
+        if (!checkDiskSpace(len)) {
             call.respond(HttpStatusCode.InsufficientStorage)
         }
-        saveToFile(targetFile, byteArray)
         call.respondText(Gson().toJson(mapOf("id" to id.toString())))
+        saveToFile(targetFile, decodeImage(imgStr))
     }
 }
 
@@ -55,13 +58,17 @@ private fun checkDiskSpace(bytes: Long): Boolean {
     return if (max == null) true else spaceUsed < max * 1024 * 1024
 }
 
-private fun decodeImage(encoded: String): ByteArray {
-    val urlDecoded = URLDecoder.decode(encoded, StandardCharsets.UTF_8.name())
-    return Base64.getDecoder().decode(urlDecoded)
+private suspend fun decodeImage(encoded: String): ByteArray {
+    return withContext(Dispatchers.Unconfined) {
+        val urlDecoded = URLDecoder.decode(encoded, StandardCharsets.UTF_8.name())
+        return@withContext Base64.getDecoder().decode(urlDecoded)
+    }
 }
 
-private fun saveToFile(targetFile: File, byteArray: ByteArray) {
-    targetFile.writeBytes(byteArray)
+private suspend fun saveToFile(targetFile: File, byteArray: ByteArray) {
+    withContext(Dispatchers.IO) {
+        targetFile.writeBytes(byteArray)
+    }
 }
 
 data class UploadLimit(val address: String, val maxUploads: Int, val duration: Long) {
