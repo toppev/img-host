@@ -5,19 +5,15 @@ services:
     restart: always
     build: .
     ports:
-      - "80:8080"
-    links:
-      - mongo
+      - "85:8080"
     volumes:
       - ./img_host_uploads:/uploads
-    #environment:
+      #environment:
       # provide your credentials here
       #- MONGO_INITDB_ROOT_USERNAME=root
       #- MONGO_INITDB_ROOT_PASSWORD=mypass123
   mongo:
     container_name: mongo
     image: mongo
-    ports:
-      - "27017:27017"
     volumes:
       - /data/db:/data/db
