@@ -2,6 +2,7 @@ package dev.toppe.img.host
 
 import com.google.gson.Gson
 import io.ktor.application.call
+import io.ktor.features.origin
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.post
 import io.ktor.request.receiveStream
@@ -28,6 +29,8 @@ private var maxPostSize = 2000000
 fun Route.upload(imageDatabase: ImageDatabase) {
 
     post<Upload> {
+        // This possibly can be spoofed if not behind a reverse proxy (?)
+        val address = call.request.origin.remoteHost
         // TODO: implement UploadLimit
         val input = call.receiveStream()
         val map = Gson().fromJson(InputStreamReader(input.buffered()), Map::class.java)
@@ -35,7 +38,8 @@ fun Route.upload(imageDatabase: ImageDatabase) {
         // TODO different extensions
         val fileName = "$id.png"
         val targetFile = File(uploadDir, fileName)
-        val image = Image(targetFile.path, getInMillis(map["expiration"] as String))
+        val image = Image(targetFile.path, getInMillis(map["expiration"] as String), address)
+
         imageDatabase.saveImage(image, id)
         val imgStr = map["image"] as String
         val len = imgStr.length.toLong()

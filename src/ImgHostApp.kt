@@ -15,7 +15,6 @@ import io.ktor.http.content.static
 import io.ktor.locations.Location
 import io.ktor.locations.Locations
 import io.ktor.routing.routing
-import kotlinx.css.Position
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -52,7 +51,7 @@ fun Application.main(testing: Boolean = false) {
         default()
         excludeContentType(ContentType.Video.Any)
     }
-
+    install(XForwardedHeaderSupport)
     // Load templates
     install(FreeMarker) {
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, "templates")

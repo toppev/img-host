@@ -6,6 +6,7 @@ import java.io.File
 data class Image(
     val path: String,
     val expiration: Long? = null,
+    val uploaderAddress: String? = null,
     val created: Long = System.currentTimeMillis()
 ) {
 
