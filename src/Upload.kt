@@ -70,25 +70,3 @@ private suspend fun saveToFile(targetFile: File, byteArray: ByteArray) {
         targetFile.writeBytes(byteArray)
     }
 }
-
-data class UploadLimit(val address: String, val maxUploads: Int, val duration: Long) {
-
-    private var nextReset: Long = System.currentTimeMillis() + duration
-    private var uploadsLeft = maxUploads
-
-    init {
-        require(maxUploads > 0) { "maxUploads must be positive" }
-        require(duration > 0) { "duration must be positive" }
-        require(address.isNotEmpty()) { "address must not be empty" }
-    }
-
-    fun tryConsume(i: Int): Boolean {
-        require(i > 0) { "tryConsume with parameter 0 is not allowed" }
-        if (uploadsLeft < i && nextReset < System.currentTimeMillis()) {
-            nextReset = System.currentTimeMillis() + duration
-            uploadsLeft = maxUploads
-        }
-        uploadsLeft -= i
-        return uploadsLeft > 0
-    }
-}
