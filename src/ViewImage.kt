@@ -16,11 +16,11 @@ import java.util.*
 fun Route.viewImage(imageDatabase: ImageDatabase) {
 
     get<ViewImage> {
-        // Remove file extension if present
         if (!validIdString(it.id)) {
             call.respond(HttpStatusCode.BadRequest)
         } else {
-            val id = if (it.id.contains(".")) it.id.substring(0, it.id.lastIndexOf('.')) else it.id
+            // Remove file extension if present
+            val id = stripExtension(it.id)
             val img = imageDatabase.findImageById(id)
             if (img == null || !img.exists()) {
                 call.respond(HttpStatusCode.NotFound)
@@ -42,27 +42,38 @@ fun Route.viewImage(imageDatabase: ImageDatabase) {
                         )
                     )
                 )
-                imageDatabase.updateOnView(img, id)
             }
         }
     }
 
     get<RawImage> { it ->
-        val path = uploadDir + File.separator + it.id
-        val file = File(path)
-        // Just to be sure
         if (!validIdString(it.id)) {
             call.respond(HttpStatusCode.BadRequest)
-        } else if (!file.exists()) {
-            call.respond(HttpStatusCode.NotFound)
         } else {
-            call.respond(
-                LocalFileContent(
-                    file,
-                    contentType = ContentType.fromFilePath(path).first { it.contentType == "image" })
-            )
+            // Remove file extension if present
+            val id = stripExtension(it.id)
+            val img = imageDatabase.findImageById(id)
+            if (img == null || !img.exists()) {
+                call.respond(HttpStatusCode.NotFound)
+            } else {
+                val file = File(img.path)
+                if (!file.exists()) {
+                    call.respond(HttpStatusCode.NotFound)
+                } else {
+                    call.respond(
+                        LocalFileContent(
+                            file,
+                            contentType = ContentType.fromFilePath(file.path).first { it.contentType == "image" })
+                    )
+                    imageDatabase.updateOnView(img, id)
+                }
+            }
         }
     }
+}
+
+private fun stripExtension(str: String): String {
+    return if (str.contains(".")) str.substring(0, str.lastIndexOf('.')) else str
 }
 
 private fun validIdString(id: String): Boolean {
