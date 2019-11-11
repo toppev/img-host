@@ -26,21 +26,10 @@ fun Route.viewImage(imageDatabase: ImageDatabase) {
             if (img == null || !img.exists()) {
                 call.respond(HttpStatusCode.NotFound)
             } else {
-                val created = SimpleDateFormat().format(Date(img.created))
-                val expires =
-                    if (img.expires()) SimpleDateFormat().format(Date(System.currentTimeMillis() + img.expiration!!)) else "never"
-                val lastViewed =
-                    if (img.lastViewed != null) SimpleDateFormat().format(Date(img.lastViewed!!)) else "never"
                 call.respond(
                     FreeMarkerContent(
                         "image.ftl",
-                        mapOf(
-                            "image" to img,
-                            "id" to id,
-                            "created" to created,
-                            "expires" to expires,
-                            "lastViewed" to lastViewed
-                        )
+                        mapOf("image" to img)
                     )
                 )
             }

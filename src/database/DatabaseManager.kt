@@ -12,17 +12,14 @@ import java.io.InputStream
 import java.util.*
 
 
-class DatabaseManager(val propertiesStream: InputStream? = null) {
+class DatabaseManager() {
 
     private val properties = Properties()
-    private val settings = getDatabaseSettings()
+    private var settings: MongoClientSettings
 
     init {
-        val stream = propertiesStream ?: Thread.currentThread().contextClassLoader.getResourceAsStream("database.properties")
+        val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("database.properties")
         properties.load(stream)
-    }
-
-    private fun getDatabaseSettings(): MongoClientSettings {
         val database = properties.getProperty("database")
         val user = properties.getProperty("user", null)
         val pass = properties.getProperty("password", null)
@@ -32,7 +29,7 @@ class DatabaseManager(val propertiesStream: InputStream? = null) {
         if (user != null && pass != null) {
             settings.credential(MongoCredential.createCredential(user, database, pass.toCharArray()))
         }
-        return settings.build()
+        this.settings = settings.build()
     }
 
     fun createImageDatabase(): ImageDatabase {

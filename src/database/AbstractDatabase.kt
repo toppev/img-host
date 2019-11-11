@@ -1,10 +1,10 @@
 package dev.toppe.img.host.database
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.mongodb.BasicDBObject
 import com.mongodb.client.MongoDatabase
 import kotlinx.coroutines.Dispatchers
-import com.mongodb.BasicDBObject
-import com.mongodb.client.model.Aggregates.limit
 import kotlinx.coroutines.withContext
 import org.bson.Document
 import org.bson.json.JsonMode
@@ -17,7 +17,7 @@ abstract class AbstractDatabase {
 
     suspend fun saveObject(obj: Any, collection: String, objectId: ObjectId? = null): ObjectId {
         return withContext(Dispatchers.IO) {
-            val json = Gson().toJson(obj)
+            val json = getGson().toJson(obj)
             // Parse to bson document and insert
             val doc = Document.parse(json)
             doc["_id"] = objectId
@@ -26,21 +26,32 @@ abstract class AbstractDatabase {
         }
     }
 
-    suspend inline fun<reified T> findByProperty(property: String, value: Any, collection: String): T? {
+    suspend inline fun <reified T> findByProperty(property: String, value: Any, collection: String): T? {
         return withContext(Dispatchers.IO) {
             val query = BasicDBObject(property, value)
             val obj = getDatabase().getCollection(collection).find(query).first()
-            return@withContext Gson().fromJson(obj?.toJson(writerSettings), T::class.java)
+            return@withContext getGson().fromJson(obj?.toJson(writerSettings), T::class.java)
         }
     }
 
-    suspend inline fun<reified T> findAllByProperty(property: String, value: Any, from: Int = 0, to: Int = 10, collection: String): List<T> {
+    suspend inline fun <reified T> findAllByProperty(
+        property: String,
+        value: Any,
+        from: Int = 0,
+        to: Int = 10,
+        collection: String
+    ): List<T> {
         return withContext(Dispatchers.IO) {
             val query = BasicDBObject(property, value)
-            return@withContext getDatabase().getCollection(collection).find(query).skip(from).limit(to-from).toList().map {
-                Gson().fromJson(it.toJson(writerSettings), T::class.java)
-            }
+            return@withContext getDatabase().getCollection(collection).find(query).skip(from).limit(to - from).toList()
+                .map {
+                    getGson().fromJson(it.toJson(writerSettings), T::class.java)
+                }
         }
+    }
+
+    fun getGson(): Gson {
+        return GsonBuilder().registerTypeAdapter(ObjectId::class.java, GsonTypeAdapter()).create()
     }
 
     abstract fun getDatabase(): MongoDatabase

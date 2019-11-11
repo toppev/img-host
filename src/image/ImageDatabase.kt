@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
 import java.io.File
+import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 
 class ImageDatabase(mongoClient: MongoClient, database: String, uploadDir: File) : AbstractDatabase() {
@@ -29,7 +30,7 @@ class ImageDatabase(mongoClient: MongoClient, database: String, uploadDir: File)
     }
 
     suspend fun findImagesByUserId(id: String, from: Int = 0, to: Int = 10): List<Image>? {
-       return super.findAllByProperty("_id", id, from, to, collection)
+       return super.findAllByProperty("user", ObjectId(id), from, to, collection)
     }
 
     suspend fun findImagesByToken(token: String, from: Int = 0, to: Int = 10): List<Image>? {

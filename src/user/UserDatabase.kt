@@ -4,7 +4,6 @@ import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoDatabase
 import dev.toppe.img.host.database.AbstractDatabase
 import org.bson.types.ObjectId
-import java.io.File
 
 
 class UserDatabase(mongoClient: MongoClient, database: String) : AbstractDatabase() {
@@ -22,11 +21,11 @@ class UserDatabase(mongoClient: MongoClient, database: String) : AbstractDatabas
     }
 
     suspend fun findUserById(id: String): User? {
-        return super.findByProperty("_id", ObjectId(id), collection)
+        return super.findByProperty("_id", id, collection)
     }
 
-    suspend fun findUserByToken(id: String): User? {
-        return super.findByProperty("token", ObjectId(id), collection)
+    suspend fun findUserByToken(token: String): User? {
+        return super.findByProperty("token", token, collection)
     }
 
 
