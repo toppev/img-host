@@ -9,6 +9,7 @@ import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import kotlinx.coroutines.async
+import kotlinx.css.times
 import org.bson.types.ObjectId
 
 fun Route.userImages(
@@ -21,9 +22,12 @@ fun Route.userImages(
             call.respond(HttpStatusCode.BadRequest)
         } else {
             val valid = ObjectId.isValid(it.id)
-            val userImages = async { if (valid) imageDatabase.findImagesByUserId(it.id) else null }
+            val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 0
+            val from = page*10
+            val to = from+10
+            val userImages = async { if (valid) imageDatabase.findImagesByUserId(it.id, from, to) else null }
             val user = async { if (valid) usersDatabase.findUserById(it.id) else null }
-            val tokenImages = async { imageDatabase.findImagesByToken(it.id) }
+            val tokenImages = async { imageDatabase.findImagesByToken(it.id, from, to) }
             val imagesList = tokenImages.await().orEmpty() + tokenImages.await().orEmpty()
             // TODO: Better (error) handling
             if (imagesList.isEmpty()) {
