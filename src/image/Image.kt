@@ -1,11 +1,13 @@
-package dev.toppe.img.host
+package dev.toppe.img.host.image
 
+import dev.toppe.img.host.user.User
 import java.io.File
 
 
 data class Image(
     val path: String,
     val expiration: Long? = null,
+    val token: String? = null,
     val created: Long = System.currentTimeMillis()
 ) {
 

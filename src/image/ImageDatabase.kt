@@ -1,40 +1,39 @@
-package dev.toppe.img.host
+package dev.toppe.img.host.image
 
-import com.google.gson.Gson
 import com.mongodb.BasicDBObject
 import com.mongodb.client.MongoClient
+import com.mongodb.client.MongoDatabase
+import dev.toppe.img.host.database.AbstractDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.bson.Document
-import org.bson.json.JsonMode
-import org.bson.json.JsonWriterSettings
 import org.bson.types.ObjectId
 import java.io.File
 
 
-class ImageDatabase(mongoClient: MongoClient, database: String, uploadDir: File) {
+class ImageDatabase(mongoClient: MongoClient, database: String, uploadDir: File) : AbstractDatabase() {
 
     private val database = mongoClient.getDatabase(database)
     private val collection = "images"
 
+
+    override fun getDatabase(): MongoDatabase {
+        return database
+    }
+
     suspend fun saveImage(image: Image, objectId: ObjectId? = null): ObjectId {
-        return withContext(Dispatchers.IO) {
-            val json = Gson().toJson(image)
-            // Parse to bson document and insert
-            val doc = Document.parse(json)
-            doc["_id"] = objectId
-            database.getCollection(collection).insertOne(doc)
-            return@withContext doc.getObjectId("_id")
-        }
+        return super.saveObject(image, collection, objectId)
     }
 
     suspend fun findImageById(id: String): Image? {
-        return withContext(Dispatchers.IO) {
-            val query = BasicDBObject("_id", ObjectId(id))
-            val obj = database.getCollection(collection).find(query).first()
-            var writerSettings = JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()
-            return@withContext Gson().fromJson(obj?.toJson(writerSettings), Image::class.java)
-        }
+        return super.findByProperty("_id", ObjectId(id), collection)
+    }
+
+    suspend fun findImagesByUserId(id: String, from: Int = 0, to: Int = 10): List<Image>? {
+       return super.findAllByProperty("_id", id, from, to, collection)
+    }
+
+    suspend fun findImagesByToken(token: String, from: Int = 0, to: Int = 10): List<Image>? {
+        return super.findAllByProperty("token", token, from, to, collection)
     }
 
     /**

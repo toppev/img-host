@@ -1,5 +1,6 @@
 package dev.toppe.img.host
 
+import dev.toppe.img.host.image.ImageDatabase
 import io.ktor.application.call
 import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.http.ContentType
@@ -76,6 +77,6 @@ private fun stripExtension(str: String): String {
     return if (str.contains(".")) str.substring(0, str.lastIndexOf('.')) else str
 }
 
-private fun validIdString(id: String): Boolean {
+fun validIdString(id: String): Boolean {
     return id.matches("[A-Za-z0-9.]+".toRegex())
 }

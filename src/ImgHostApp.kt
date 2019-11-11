@@ -1,9 +1,6 @@
 package dev.toppe.img.host
 
-import com.mongodb.ConnectionString
-import com.mongodb.MongoClientSettings
-import com.mongodb.MongoCredential
-import com.mongodb.client.MongoClients
+import dev.toppe.img.host.database.DatabaseManager
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
 import io.ktor.application.install
@@ -15,10 +12,8 @@ import io.ktor.http.content.static
 import io.ktor.locations.Location
 import io.ktor.locations.Locations
 import io.ktor.routing.routing
-import kotlinx.css.Position
 import java.io.File
 import java.io.IOException
-import java.util.*
 
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -28,6 +23,9 @@ data class ViewImage(val id: String)
 
 @Location("/img/{id}")
 class RawImage(val id: String)
+
+@Location("/user/{token}")
+class UserImages(val token: String)
 
 @Location("/api/upload")
 class Upload
@@ -62,37 +60,23 @@ fun Application.main(testing: Boolean = false) {
     if (!uploadFile.mkdirs() && !uploadFile.exists()) {
         throw IOException("Failed to create directory ${uploadFile.absolutePath}")
     }
-    val imageDatabase = loadDatabase()
+
+    val dbManager = DatabaseManager()
+
+    val imageDatabase = dbManager.createImageDatabase()
+    val usersDatabase = dbManager.createUsersDatabase()
 
     routing {
         upload(imageDatabase)
         viewImage(imageDatabase)
-                // styles()
+        userImages(usersDatabase, imageDatabase)
+
         index()
 
         static("static") {
             resources("static")
         }
     }
-}
 
-fun loadDatabase(): ImageDatabase {
-    val prop = Properties()
-    val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("database.properties")
-    prop.load(stream)
-    val database = prop.getProperty("database")
-    val user = prop.getProperty("user", null)
-    val pass = prop.getProperty("password", null)
-    val settings = MongoClientSettings.builder()
-        .applyConnectionString(ConnectionString("mongodb://${prop.getProperty("url")}:27017"))
-    // Credentials are optional
-    if (user != null && pass != null) {
-        settings.credential(MongoCredential.createCredential(user, database, pass.toCharArray()))
-    }
-    return ImageDatabase(
-        MongoClients.create(settings.build()),
-        database,
-        File(uploadDir)
-    )
 }
 
