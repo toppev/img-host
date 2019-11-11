@@ -9,6 +9,7 @@ import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import kotlinx.coroutines.async
+import org.bson.types.ObjectId
 
 fun Route.userImages(
     usersDatabase: UserDatabase,
@@ -16,20 +17,18 @@ fun Route.userImages(
 ) {
 
     get<UserImages> {
-        if (!validIdString(it.token)) {
+        if (!validIdString(it.id)) {
             call.respond(HttpStatusCode.BadRequest)
         } else {
-            val images = async {imageDatabase.findImagesByToken(it.token)}
-            val user = async {usersDatabase.findUserByToken(it.token)}
-            val imagesList = images.await()
-            // TODO: Better handling
-            if (false && user.await() == null) {
-                call.respond(HttpStatusCode.NotFound, "user not found :(")
-            }
-            else if(imagesList == null || imagesList.isEmpty()) {
+            val valid = ObjectId.isValid(it.id)
+            val userImages = async { if (valid) imageDatabase.findImagesByUserId(it.id) else null }
+            val user = async { if (valid) usersDatabase.findUserById(it.id) else null }
+            val tokenImages = async { imageDatabase.findImagesByToken(it.id) }
+            val imagesList = tokenImages.await().orEmpty() + tokenImages.await().orEmpty()
+            // TODO: Better (error) handling
+            if (imagesList.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "no images found :(")
-            }
-            else {
+            } else {
                 call.respond(
                     FreeMarkerContent(
                         "userimages.ftl",

@@ -24,8 +24,8 @@ data class ViewImage(val id: String)
 @Location("/img/{id}")
 class RawImage(val id: String)
 
-@Location("/user/{token}")
-class UserImages(val token: String)
+@Location("/uploader/{id}")
+class UserImages(val id: String)
 
 @Location("/api/upload")
 class Upload
