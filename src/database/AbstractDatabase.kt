@@ -17,7 +17,7 @@ abstract class AbstractDatabase {
 
     suspend fun saveObject(obj: Any, collection: String, objectId: ObjectId? = null): ObjectId {
         return withContext(Dispatchers.IO) {
-            val json = getGson().toJson(obj)
+            val json = createGson().toJson(obj)
             // Parse to bson document and insert
             val doc = Document.parse(json)
             doc["_id"] = objectId
@@ -30,7 +30,7 @@ abstract class AbstractDatabase {
         return withContext(Dispatchers.IO) {
             val query = BasicDBObject(property, value)
             val obj = getDatabase().getCollection(collection).find(query).first()
-            return@withContext getGson().fromJson(obj?.toJson(writerSettings), T::class.java)
+            return@withContext createGson().fromJson(obj?.toJson(writerSettings), T::class.java)
         }
     }
 
@@ -45,12 +45,12 @@ abstract class AbstractDatabase {
             val query = BasicDBObject(property, value)
             return@withContext getDatabase().getCollection(collection).find(query).skip(from).limit(to - from).toList()
                 .map {
-                    getGson().fromJson(it.toJson(writerSettings), T::class.java)
+                    createGson().fromJson(it.toJson(writerSettings), T::class.java)
                 }
         }
     }
 
-    fun getGson(): Gson {
+    fun createGson(): Gson {
         return GsonBuilder().registerTypeAdapter(ObjectId::class.java, ObjectIdTypeAdapter()).create()
     }
 
