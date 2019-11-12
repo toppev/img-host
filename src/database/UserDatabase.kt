@@ -1,8 +1,8 @@
-package dev.toppe.img.host.user
+package dev.toppe.img.host.database
 
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoDatabase
-import dev.toppe.img.host.database.AbstractDatabase
+import dev.toppe.img.host.User
 import org.bson.types.ObjectId
 
 
@@ -13,11 +13,11 @@ class UserDatabase(mongoClient: MongoClient, database: String) : AbstractDatabas
 
 
     override fun getDatabase(): MongoDatabase {
-        return database;
+        return database
     }
 
     suspend fun saveUser(user: User, objectId: ObjectId? = null): ObjectId {
-        return super.saveObject(user, collection, objectId);
+        return super.saveObject(user, collection, objectId)
     }
 
     suspend fun findUserById(id: String): User? {

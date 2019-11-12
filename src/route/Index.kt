@@ -1,5 +1,6 @@
-package dev.toppe.img.host
+package dev.toppe.img.host.route
 
+import dev.toppe.img.host.Index
 import io.ktor.application.call
 import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.locations.get

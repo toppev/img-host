@@ -1,8 +1,11 @@
-package dev.toppe.img.host
+package dev.toppe.img.host.route
 
 import com.google.gson.Gson
-import dev.toppe.img.host.image.Image
-import dev.toppe.img.host.image.ImageDatabase
+import dev.toppe.img.host.Upload
+import dev.toppe.img.host.Image
+import dev.toppe.img.host.database.ImageDatabase
+import dev.toppe.img.host.getInMillis
+import dev.toppe.img.host.uploadDir
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.post

@@ -6,22 +6,22 @@ import com.google.gson.stream.JsonWriter
 import org.bson.types.ObjectId
 import java.io.IOException
 
-class GsonTypeAdapter : TypeAdapter<ObjectId>() {
+class ObjectIdTypeAdapter : TypeAdapter<ObjectId>() {
 
     @Throws(IOException::class)
-    override fun write(out: JsonWriter, value: ObjectId) {
-        out.beginObject()
+    override fun write(writer: JsonWriter, value: ObjectId) {
+        writer.beginObject()
             .name("\$oid")
             .value(value.toString())
             .endObject()
     }
 
     @Throws(IOException::class)
-    override fun read(`in`: JsonReader): ObjectId {
-        `in`.beginObject()
-        assert("\$oid" == `in`.nextName())
-        val objectId = `in`.nextString()
-        `in`.endObject()
+    override fun read(reader: JsonReader): ObjectId {
+        reader.beginObject()
+        assert("\$oid" == reader.nextName())
+        val objectId = reader.nextString()
+        reader.endObject()
         return ObjectId(objectId)
     }
 }

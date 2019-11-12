@@ -4,15 +4,12 @@ import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.MongoCredential
 import com.mongodb.client.MongoClients
-import dev.toppe.img.host.image.ImageDatabase
 import dev.toppe.img.host.uploadDir
-import dev.toppe.img.host.user.UserDatabase
 import java.io.File
-import java.io.InputStream
 import java.util.*
 
 
-class DatabaseManager() {
+class DatabaseManager {
 
     private val properties = Properties()
     private var settings: MongoClientSettings

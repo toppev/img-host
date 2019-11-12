@@ -1,6 +1,8 @@
-package dev.toppe.img.host
+package dev.toppe.img.host.route
 
-import dev.toppe.img.host.image.ImageDatabase
+import dev.toppe.img.host.RawImage
+import dev.toppe.img.host.ViewImage
+import dev.toppe.img.host.database.ImageDatabase
 import io.ktor.application.call
 import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.http.ContentType
@@ -11,8 +13,6 @@ import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 
 fun Route.viewImage(imageDatabase: ImageDatabase) {
 

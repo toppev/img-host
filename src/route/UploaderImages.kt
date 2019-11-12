@@ -1,7 +1,8 @@
-package dev.toppe.img.host
+package dev.toppe.img.host.route
 
-import dev.toppe.img.host.image.ImageDatabase
-import dev.toppe.img.host.user.UserDatabase
+import dev.toppe.img.host.UserImages
+import dev.toppe.img.host.database.ImageDatabase
+import dev.toppe.img.host.database.UserDatabase
 import io.ktor.application.call
 import io.ktor.freemarker.FreeMarkerContent
 import io.ktor.http.HttpStatusCode
@@ -9,7 +10,6 @@ import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import kotlinx.coroutines.async
-import kotlinx.css.times
 import org.bson.types.ObjectId
 
 fun Route.userImages(

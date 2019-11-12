@@ -51,7 +51,7 @@ abstract class AbstractDatabase {
     }
 
     fun getGson(): Gson {
-        return GsonBuilder().registerTypeAdapter(ObjectId::class.java, GsonTypeAdapter()).create()
+        return GsonBuilder().registerTypeAdapter(ObjectId::class.java, ObjectIdTypeAdapter()).create()
     }
 
     abstract fun getDatabase(): MongoDatabase

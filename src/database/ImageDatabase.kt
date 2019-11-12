@@ -1,14 +1,13 @@
-package dev.toppe.img.host.image
+package dev.toppe.img.host.database
 
 import com.mongodb.BasicDBObject
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoDatabase
-import dev.toppe.img.host.database.AbstractDatabase
+import dev.toppe.img.host.Image
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
 import java.io.File
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 
 class ImageDatabase(mongoClient: MongoClient, database: String, uploadDir: File) : AbstractDatabase() {

@@ -1,8 +1,5 @@
-package dev.toppe.img.host.image
+package dev.toppe.img.host
 
-import com.google.gson.annotations.SerializedName
-import dev.toppe.img.host.user.User
-import kotlinx.css.img
 import org.bson.types.ObjectId
 import java.io.File
 import java.text.SimpleDateFormat
