@@ -38,7 +38,8 @@ fun Route.userImages(
                         "userimages.ftl",
                         mapOf(
                             "images" to imagesList,
-                            "user" to user
+                            "user" to user,
+                            "page" to page
                         )
                     )
                 )

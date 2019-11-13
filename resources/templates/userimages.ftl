@@ -13,22 +13,34 @@
 </head>
 
 <body>
-    <div class="container main">
-        <#list images as image>
-            <div class="container">
-                <div class="card">
-                    <div class="card-image">
-                        <img src="../img/${image._id}.png">
-                    </div>
-                </div>
-                <div class="card-content teal lighten-1 z-depth-2">
-                    <div class="row">
-                        <div class="col s2 offset-s3">👁 ${image.views}</div>
-                    </div>
+<div class="container main">
+    <#list images as image>
+        <div class="container">
+            <div class="card">
+                <div class="card-image">
+                    <img src="../img/${image._id}.png">
                 </div>
             </div>
-        </#list>
+            <div class="card-content teal lighten-1 z-depth-2">
+                <div class="row">
+                    <div class="col s2 offset-s3">👁 ${image.views}</div>
+                </div>
+            </div>
+        </div>
+    </#list>
+
+    <div class="pagination">
+        <div class="row">
+            <div class="flexbox">
+                <div class="center-align">
+                    <a href="?page=${page}">&laquo;</a>
+                    <a class="active" href="#">Page ${page+1}</a>
+                    <a href="?page=${page}">&raquo;</a>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 </body>
 
 </html>
