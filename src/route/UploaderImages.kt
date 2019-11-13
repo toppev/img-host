@@ -24,6 +24,7 @@ fun Route.userImages(
             val valid = ObjectId.isValid(it.id)
             val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 0
             val from = page*10
+            // 11 instead of 10 so we know if there are more images
             val to = from+11
             val userImages = async { if (valid) imageDatabase.findImagesByUserId(it.id, from, to) else null }
             val user = async { if (valid) usersDatabase.findUserById(it.id) else null }
