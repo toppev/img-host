@@ -31,7 +31,7 @@
             <div class="row">
                 <div class="col s8 offset-s2">
                     <div class="card teal lighten-1">
-                        <table class="striped responsive-table highlight centered">
+                        <table class="stripedg highlight centered">
                             <thead>
                                 <tr>
                                     <th>Shortcut</th>
