@@ -33,9 +33,15 @@
         <div class="row">
             <div class="flexbox">
                 <div class="center-align">
-                    <a href="?page=${page}">&laquo;</a>
-                    <a class="active" href="#">Page ${page+1}</a>
-                    <a href="?page=${page}">&raquo;</a>
+                    <#if 0 < page>
+                        <a href="?page=${page}">&laquo;</a>
+                    </#if>
+                    <#if page gt 0 || hasNextPage>
+                        <a class="active" href="#">Page ${page+1}</a>
+                    </#if>
+                    <#if hasNextPage>
+                        <a href="?page=${page}">&raquo;</a>
+                    </#if>
                 </div>
             </div>
         </div>

@@ -24,11 +24,12 @@ fun Route.userImages(
             val valid = ObjectId.isValid(it.id)
             val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 0
             val from = page*10
-            val to = from+10
+            val to = from+11
             val userImages = async { if (valid) imageDatabase.findImagesByUserId(it.id, from, to) else null }
             val user = async { if (valid) usersDatabase.findUserById(it.id) else null }
             val tokenImages = async { imageDatabase.findImagesByToken(it.id, from, to) }
-            val imagesList = tokenImages.await().orEmpty() + tokenImages.await().orEmpty()
+            val allImages = tokenImages.await().orEmpty() + tokenImages.await().orEmpty()
+            val imagesList = allImages.take(10)
             // TODO: Better (error) handling
             if (imagesList.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "no images found :(")
@@ -39,7 +40,8 @@ fun Route.userImages(
                         mapOf(
                             "images" to imagesList,
                             "user" to user,
-                            "page" to page
+                            "page" to page,
+                            "hasNextPage" to (allImages.size > imagesList.size)
                         )
                     )
                 )
