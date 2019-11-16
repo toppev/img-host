@@ -69,7 +69,7 @@
                 </div>
             </div>
         </div>
-        <footer class="page-footer pink lighten-2">
+        <footer class="page-footer indigo darken-3">
             <div class="container center-align">
                 <div class="row">
                     <div class="col offset-s4 s2">
@@ -85,7 +85,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="footer-copyright">
+                <div class="footer-copyright indigo darken-3">
                     <div class="container">
                         © 2019 <a href="https://img.toppe.dev">toppe.dev</a>
                     </div>
