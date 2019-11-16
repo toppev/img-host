@@ -16,7 +16,9 @@ body {
   margin-top: 55px;
   margin-bottom: 45px;
 }
-
+.github p {
+  color: floralwhite;
+}
 .pagination a {
   color: black;
   float: left;
