@@ -15,7 +15,7 @@ apply plugin: 'application'
 
 mainClassName = 'io.ktor.server.netty.EngineMain'
 group 'dev.toppe.img.host'
-version '0.0.1'
+version '0.1.0'
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
