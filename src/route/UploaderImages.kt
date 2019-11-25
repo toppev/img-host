@@ -1,6 +1,6 @@
 package dev.toppe.img.host.route
 
-import dev.toppe.img.host.UserImages
+import dev.toppe.img.host.UploaderImages
 import dev.toppe.img.host.database.ImageDatabase
 import dev.toppe.img.host.database.UserDatabase
 import io.ktor.application.call
@@ -12,12 +12,12 @@ import io.ktor.routing.Route
 import kotlinx.coroutines.async
 import org.bson.types.ObjectId
 
-fun Route.userImages(
+fun Route.uploaderImages(
     usersDatabase: UserDatabase,
     imageDatabase: ImageDatabase
 ) {
 
-    get<UserImages> {
+    get<UploaderImages> {
         if (!validIdString(it.id)) {
             call.respond(HttpStatusCode.BadRequest)
         } else {
@@ -29,7 +29,8 @@ fun Route.userImages(
             val userImages = async { if (valid) imageDatabase.findImagesByUserId(it.id, from, to) else null }
             val user = async { if (valid) usersDatabase.findUserById(it.id) else null }
             val tokenImages = async { imageDatabase.findImagesByToken(it.id, from, to) }
-            val allImages = tokenImages.await().orEmpty() + tokenImages.await().orEmpty()
+            val allImages = (tokenImages.await().orEmpty() + tokenImages.await().orEmpty()).distinct()
+
             val imagesList = allImages.take(10)
             // TODO: Better (error) handling
             if (imagesList.isEmpty()) {

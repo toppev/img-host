@@ -40,7 +40,7 @@ fun Route.upload(imageDatabase: ImageDatabase) {
         // TODO different extensions
         val fileName = "$id.png"
         val targetFile = File(uploadDir, fileName)
-        val image = Image(targetFile.path, getInMillis(map["expiration"] as String))
+        val image = Image(targetFile.path, getInMillis(map["expiration"] as String), map["token"] as String)
         imageDatabase.saveImage(image, id)
         val imgStr = map["image"] as String
         val len = imgStr.length.toLong()

@@ -21,6 +21,9 @@ class ImageDatabase(mongoClient: MongoClient, database: String, uploadDir: File)
     }
 
     suspend fun saveImage(image: Image, objectId: ObjectId? = null): ObjectId {
+        if (objectId != null) {
+            image._id = objectId
+        }
         return super.saveObject(image, collection, objectId)
     }
 

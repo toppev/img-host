@@ -1,10 +1,7 @@
 package dev.toppe.img.host
 
 import dev.toppe.img.host.database.DatabaseManager
-import dev.toppe.img.host.route.index
-import dev.toppe.img.host.route.upload
-import dev.toppe.img.host.route.userImages
-import dev.toppe.img.host.route.viewImage
+import dev.toppe.img.host.route.*
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
 import io.ktor.application.install
@@ -29,7 +26,7 @@ data class ViewImage(val id: String)
 class RawImage(val id: String)
 
 @Location("/uploader/{id}")
-class UserImages(val id: String)
+class UploaderImages(val id: String)
 
 @Location("/api/upload")
 class Upload
@@ -73,7 +70,7 @@ fun Application.main(testing: Boolean = false) {
     routing {
         upload(imageDatabase)
         viewImage(imageDatabase)
-        userImages(usersDatabase, imageDatabase)
+        uploaderImages(usersDatabase, imageDatabase)
 
         index()
 
