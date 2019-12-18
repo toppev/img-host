@@ -34,13 +34,13 @@
             <div class="flexbox">
                 <div class="center-align">
                     <#if 0 < page>
-                        <a href="?page=${page}">&laquo;</a>
+                        <a href="?page=${page-1}">&laquo;</a>
                     </#if>
                     <#if page gt 0 || hasNextPage>
                         <a class="active" href="#">Page ${page+1}</a>
                     </#if>
                     <#if hasNextPage>
-                        <a href="?page=${page}">&raquo;</a>
+                        <a href="?page=${page+1}">&raquo;</a>
                     </#if>
                 </div>
             </div>
