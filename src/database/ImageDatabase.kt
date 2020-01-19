@@ -32,7 +32,7 @@ class ImageDatabase(mongoClient: MongoClient, database: String, uploadDir: File)
     }
 
     suspend fun findImagesByUserId(id: String, from: Int = 0, to: Int = 10): List<Image>? {
-       return super.findAllByProperty("user", ObjectId(id), from, to, collection)
+        return super.findAllByProperty("user", ObjectId(id), from, to, collection)
     }
 
     suspend fun findImagesByToken(token: String, from: Int = 0, to: Int = 10): List<Image>? {
@@ -43,10 +43,10 @@ class ImageDatabase(mongoClient: MongoClient, database: String, uploadDir: File)
      * Updates the database, adds one to "views" and updates "lastSeen".
      * NOTE: Does not change the given image object, only updates the database
      */
-    suspend fun updateOnView(image: Image, id: String){
+    suspend fun updateOnView(image: Image, id: String) {
         withContext(Dispatchers.IO) {
             val updateFields = BasicDBObject()
-            updateFields.append("views", image.views+1)
+            updateFields.append("views", image.views + 1)
             updateFields.append("lastViewed", System.currentTimeMillis())
             val searchQuery = BasicDBObject("_id", ObjectId(id))
             database.getCollection(collection).updateOne(searchQuery, BasicDBObject("\$set", updateFields))

@@ -1,12 +1,14 @@
 package dev.toppe.img.host
 
+import java.util.concurrent.TimeUnit
+
 enum class TimeFormat(val letter: Char, val toMillis: (number: Long) -> Long) {
 
-    YEAR('Y', { java.util.concurrent.TimeUnit.DAYS.toMillis(365 * it) }),
-    MONTH('M', { java.util.concurrent.TimeUnit.DAYS.toMillis(30 * it) }),
-    WEEK('w', { java.util.concurrent.TimeUnit.DAYS.toMillis(7 * it) }),
-    DAY('D', { java.util.concurrent.TimeUnit.DAYS.toMillis(it) }),
-    HOUR('H', { java.util.concurrent.TimeUnit.HOURS.toMillis(it) });
+    YEAR('Y', { TimeUnit.DAYS.toMillis(365 * it) }),
+    MONTH('M', { TimeUnit.DAYS.toMillis(30 * it) }),
+    WEEK('w', { TimeUnit.DAYS.toMillis(7 * it) }),
+    DAY('D', { TimeUnit.DAYS.toMillis(it) }),
+    HOUR('H', { TimeUnit.HOURS.toMillis(it) });
 }
 
 fun getInMillis(format: String): Long? {

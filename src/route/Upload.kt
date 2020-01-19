@@ -1,8 +1,8 @@
 package dev.toppe.img.host.route
 
 import com.google.gson.Gson
-import dev.toppe.img.host.Upload
 import dev.toppe.img.host.Image
+import dev.toppe.img.host.Upload
 import dev.toppe.img.host.database.ImageDatabase
 import dev.toppe.img.host.getInMillis
 import dev.toppe.img.host.uploadDir
@@ -16,7 +16,8 @@ import io.ktor.routing.Route
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
-import java.io.*
+import java.io.File
+import java.io.InputStreamReader
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -44,7 +45,7 @@ fun Route.upload(imageDatabase: ImageDatabase) {
         imageDatabase.saveImage(image, id)
         val imgStr = map["image"] as String
         val len = imgStr.length.toLong()
-        if(len > maxPostSize) {
+        if (len > maxPostSize) {
             call.respond(HttpStatusCode.BadRequest, "Post size limit exceeded")
         }
         if (!checkDiskSpace(len)) {

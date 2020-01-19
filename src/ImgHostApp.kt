@@ -1,7 +1,10 @@
 package dev.toppe.img.host
 
 import dev.toppe.img.host.database.DatabaseManager
-import dev.toppe.img.host.route.*
+import dev.toppe.img.host.route.index
+import dev.toppe.img.host.route.upload
+import dev.toppe.img.host.route.uploaderImages
+import dev.toppe.img.host.route.viewImage
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.Application
 import io.ktor.application.install

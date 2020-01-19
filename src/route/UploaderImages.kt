@@ -23,13 +23,13 @@ fun Route.uploaderImages(
         } else {
             val valid = ObjectId.isValid(it.id)
             val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 0
-            val from = page*10
+            val from = page * 10
             // 11 instead of 10 so we know if there are more images
-            val to = from+11
+            val to = from + 11
             val userImages = async { if (valid) imageDatabase.findImagesByUserId(it.id, from, to) else null }
             val user = async { if (valid) usersDatabase.findUserById(it.id) else null }
             val tokenImages = async { imageDatabase.findImagesByToken(it.id, from, to) }
-            val allImages = (tokenImages.await().orEmpty() + tokenImages.await().orEmpty()).distinct()
+            val allImages = (tokenImages.await().orEmpty() + userImages.await().orEmpty()).distinct()
 
             val imagesList = allImages.take(10)
             // TODO: Better (error) handling
