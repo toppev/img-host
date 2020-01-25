@@ -14,6 +14,7 @@ import org.bson.types.ObjectId
 abstract class AbstractDatabase {
 
     val writerSettings: JsonWriterSettings = JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()
+    abstract val database: MongoDatabase
 
     suspend fun saveObject(obj: Any, collection: String, objectId: ObjectId? = null): ObjectId {
         return withContext(Dispatchers.IO) {
@@ -21,7 +22,7 @@ abstract class AbstractDatabase {
             // Parse to bson document and insert
             val doc = Document.parse(json)
             doc["_id"] = objectId
-            getDatabase().getCollection(collection).insertOne(doc)
+            database.getCollection(collection).insertOne(doc)
             return@withContext doc.getObjectId("_id")
         }
     }
@@ -29,7 +30,7 @@ abstract class AbstractDatabase {
     suspend inline fun <reified T> findByProperty(property: String, value: Any, collection: String): T? {
         return withContext(Dispatchers.IO) {
             val query = BasicDBObject(property, value)
-            val obj = getDatabase().getCollection(collection).find(query).first()
+            val obj = database.getCollection(collection).find(query).first()
             return@withContext createGson().fromJson(obj?.toJson(writerSettings), T::class.java)
         }
     }
@@ -43,7 +44,7 @@ abstract class AbstractDatabase {
     ): List<T> {
         return withContext(Dispatchers.IO) {
             val query = BasicDBObject(property, value)
-            return@withContext getDatabase().getCollection(collection).find(query).skip(from).limit(to - from).toList()
+            return@withContext database.getCollection(collection).find(query).skip(from).limit(to - from).toList()
                 .map {
                     createGson().fromJson(it.toJson(writerSettings), T::class.java)
                 }
@@ -54,5 +55,4 @@ abstract class AbstractDatabase {
         return GsonBuilder().registerTypeAdapter(ObjectId::class.java, ObjectIdTypeAdapter()).create()
     }
 
-    abstract fun getDatabase(): MongoDatabase
 }

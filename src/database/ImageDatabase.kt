@@ -12,13 +12,8 @@ import java.io.File
 
 class ImageDatabase(mongoClient: MongoClient, database: String, uploadDir: File) : AbstractDatabase() {
 
-    private val database = mongoClient.getDatabase(database)
+    override val database: MongoDatabase = mongoClient.getDatabase(database)
     private val collection = "images"
-
-
-    override fun getDatabase(): MongoDatabase {
-        return database
-    }
 
     suspend fun saveImage(image: Image, objectId: ObjectId? = null): ObjectId {
         if (objectId != null) {

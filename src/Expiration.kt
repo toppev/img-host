@@ -12,12 +12,6 @@ enum class TimeFormat(val letter: Char, val toMillis: (number: Long) -> Long) {
 }
 
 fun getInMillis(format: String): Long? {
-    val letter = format[format.length - 1]
-    for (value in TimeFormat.values()) {
-        if (value.letter == letter || value.letter.toLowerCase() == letter) {
-            val numbers = format.substring(format.length - 1)
-            return numbers.toLongOrNull()?.let { value.toMillis(it) }
-        }
-    }
-    return null
+    val tf = TimeFormat.values().find { it.letter.equals(format[format.length - 1], ignoreCase = true) }
+    return tf?.let { format.dropLast(1).toLongOrNull()?.let { other -> tf.toMillis(other) } }
 }

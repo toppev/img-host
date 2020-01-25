@@ -8,13 +8,8 @@ import org.bson.types.ObjectId
 
 class UserDatabase(mongoClient: MongoClient, database: String) : AbstractDatabase() {
 
-    private val database = mongoClient.getDatabase(database)
+    override val database: MongoDatabase = mongoClient.getDatabase(database)
     private val collection = "users"
-
-
-    override fun getDatabase(): MongoDatabase {
-        return database
-    }
 
     suspend fun saveUser(user: User, objectId: ObjectId? = null): ObjectId {
         return super.saveObject(user, collection, objectId)

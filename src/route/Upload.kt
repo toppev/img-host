@@ -34,7 +34,6 @@ private var maxPostSize = 2000000
 fun Route.upload(imageDatabase: ImageDatabase) {
 
     post<Upload> {
-        // TODO: implement UploadLimit
         val input = call.receiveStream()
         val map = Gson().fromJson(InputStreamReader(input.buffered()), Map::class.java)
         val id = ObjectId()
@@ -61,11 +60,11 @@ private fun checkDiskSpace(bytes: Long): Boolean {
     spaceUsed += bytes
     // In megabytes
     val max = System.getProperty("maxDiskUsage")?.toLongOrNull()
-    return if (max == null) true else spaceUsed < max * 1024 * 1024
+    return max == null || spaceUsed < max * 1024 * 1024
 }
 
 private suspend fun decodeImage(encoded: String): ByteArray {
-    return withContext(Dispatchers.Unconfined) {
+    return withContext(Dispatchers.IO) {
         val urlDecoded = URLDecoder.decode(encoded, StandardCharsets.UTF_8.name())
         return@withContext Base64.getDecoder().decode(urlDecoded)
     }
