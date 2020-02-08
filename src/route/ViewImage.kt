@@ -12,12 +12,13 @@ import io.ktor.http.fromFilePath
 import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.routing.Route
+import org.bson.types.ObjectId
 import java.io.File
 
 fun Route.viewImage(imageDatabase: ImageDatabase) {
 
     get<ViewImage> {
-        if (!validIdString(it.id)) {
+        if (!ObjectId.isValid(it.id)) {
             call.respond(HttpStatusCode.BadRequest)
         } else {
             // Remove file extension if present
@@ -37,8 +38,8 @@ fun Route.viewImage(imageDatabase: ImageDatabase) {
     }
 
     get<RawImage> { it ->
-        if (!validIdString(it.id)) {
-            call.respond(HttpStatusCode.BadRequest)
+        if (!ObjectId.isValid(it.id)) {
+            call.respond(HttpStatusCode.NotFound)
         } else {
             // Remove file extension if present
             val id = stripExtension(it.id)
@@ -64,8 +65,4 @@ fun Route.viewImage(imageDatabase: ImageDatabase) {
 
 private fun stripExtension(str: String): String {
     return if (str.contains(".")) str.substring(0, str.lastIndexOf('.')) else str
-}
-
-fun validIdString(id: String): Boolean {
-    return id.matches("[A-Za-z0-9.]+".toRegex())
 }

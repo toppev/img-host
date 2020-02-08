@@ -18,8 +18,8 @@ fun Route.uploaderImages(
 ) {
 
     get<UploaderImages> {
-        if (!validIdString(it.id)) {
-            call.respond(HttpStatusCode.BadRequest)
+        if (!ObjectId.isValid(it.id)) {
+            call.respond(HttpStatusCode.NotFound)
         } else {
             val valid = ObjectId.isValid(it.id)
             val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 0
